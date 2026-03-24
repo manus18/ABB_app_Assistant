@@ -11,16 +11,7 @@ if "AWS_ACCESS_KEY_ID" in st.secrets:
 else:
     load_dotenv("tools/.env")
 
-from config.models import get_llm, get_embeddings
-from rag.retriever import get_or_create_vector_store
-from tools.rag_tools import get_retriever_tool
-from agents.faq_agent import build_agent
-from agents.discovery_agent import guided_questions
-
-# Load environment variables
-load_dotenv("tools/.env")
-
-st.set_page_config(page_title="ABB Product Assistant", page_icon="", layout="wide")
+st.set_page_config(page_title="ABB Product Assistant", page_icon="⚡", layout="wide")
 
 # CSS for a more ABB-like look (ABB uses red/white/gray)
 st.markdown("""
@@ -42,11 +33,32 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+from config.models import get_llm, get_embeddings
+from rag.retriever import get_or_create_vector_store
+from rag.ingest import load_documents, split_documents
+from tools.rag_tools import get_retriever_tool
+from agents.faq_agent import build_agent
+from agents.discovery_agent import guided_questions
+
 # 1. Initialize Backend
 @st.cache_resource
 def init_backend():
     embeddings = get_embeddings()
-    vector_store = get_or_create_vector_store(embeddings)
+    index_path = "faiss_index"
+    
+    if os.path.exists(index_path):
+        with st.status("Loading knowledge base...", expanded=False):
+            vector_store = get_or_create_vector_store(embeddings)
+    else:
+        with st.status("Building knowledge base (first time setup)...", expanded=True) as status:
+            st.write("Loading documents from ABB catalogs...")
+            docs = load_documents()
+            st.write("Processing text segments...")
+            splits = split_documents(docs)
+            st.write("Generating embeddings and building index...")
+            vector_store = get_or_create_vector_store(embeddings, splits)
+            status.update(label="Index built successfully!", state="complete", expanded=False)
+            
     tool = get_retriever_tool(vector_store)
     llm = get_llm()
     agent = build_agent(llm, [tool])
