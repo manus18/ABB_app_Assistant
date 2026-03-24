@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+.venv/
+.env
+tools/.env
+
+# Data & Index
+faiss_index/
+graph/data/*.pdf
+
+# Streamlit
+.streamlit/

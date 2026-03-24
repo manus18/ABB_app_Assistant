@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-aws
+faiss-cpu
+pypdf
+pymupdf
+bs4
+streamlit
+python-dotenv
+cohere
+langchain-cohere
+langgraph
