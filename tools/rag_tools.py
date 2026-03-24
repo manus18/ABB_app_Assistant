@@ -1,7 +1,7 @@
 import os
-from langchain.tools import tool
+from langchain_core.tools import tool
 from langchain_cohere import CohereRerank
-from langchain.retrievers import ContextualCompressionRetriever
+from langchain_classic.retrievers import ContextualCompressionRetriever
 
 def get_retriever_tool(vector_store):
     

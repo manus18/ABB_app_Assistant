@@ -1,6 +1,8 @@
 langchain
+langchain-core
 langchain-community
 langchain-aws
+langchain-classic
 faiss-cpu
 pypdf
 pymupdf
